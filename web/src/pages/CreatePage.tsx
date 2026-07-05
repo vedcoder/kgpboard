@@ -92,6 +92,9 @@ export function CreatePage() {
 
   return (
     <div className="create-wrap">
+      <button type="button" className="back" onClick={() => navigate(-1)}>
+        ‹ Back
+      </button>
       <form className="auth-card create-card" onSubmit={onSubmit}>
         <h1>New {kind}</h1>
 

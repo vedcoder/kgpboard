@@ -488,6 +488,11 @@ button {
   font-size: 14px;
   color: var(--muted);
   margin-bottom: 18px;
+  /* reset for when .back is a <button> (create page) */
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
 }
 .back:hover {
   color: var(--accent);
