@@ -1,4 +1,5 @@
-// A single feed row (notice or event), linking to its detail page.
+// A vertical feed card (notice or event), linking to its detail page.
+// Every card has an image area; without a poster it shows a placeholder.
 
 import { Link } from "react-router-dom";
 import { categoryTone } from "../lib/format";
@@ -8,27 +9,34 @@ interface Props {
   title: string;
   category: string;
   date: string;
-  venue?: string; // events only
+  excerpt: string;
+  meta: string; // venue (events) or author (notices)
   imageUrl?: string | null;
 }
 
-export function FeedCard({ to, title, category, date, venue, imageUrl }: Props) {
+export function FeedCard({ to, title, category, date, excerpt, meta, imageUrl }: Props) {
+  const tone = categoryTone(category);
   return (
     <Link className="card" to={to}>
-      {imageUrl && (
-        <img className="card-thumb" src={imageUrl} alt="" loading="lazy" />
-      )}
-      <div className="card-body">
+      <div className="card-image">
+        {imageUrl ? (
+          <img src={imageUrl} alt="" loading="lazy" />
+        ) : (
+          <div className="card-image-empty">
+            <span className="mono">{category.charAt(0).toUpperCase()}</span>
+            <span className="lbl">No image</span>
+          </div>
+        )}
+        <span className={`chip overlay ${tone}`}>{category}</span>
+      </div>
+      <div className="card-content">
         <p className="card-title">{title}</p>
+        <p className="card-excerpt">{excerpt}</p>
         <div className="card-meta">
-          <span className={`chip ${categoryTone(category)}`}>{category}</span>
-          {venue && <span>📍 {venue}</span>}
+          <span className="venue">{meta}</span>
+          <span className="date">{date}</span>
         </div>
       </div>
-      <span className="card-date">{date}</span>
-      <span className="chev" aria-hidden="true">
-        ›
-      </span>
     </Link>
   );
 }

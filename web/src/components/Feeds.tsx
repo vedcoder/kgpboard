@@ -34,6 +34,8 @@ export function NoticesFeed({ filters }: { filters: FeedFilters }) {
           to={`/notices/${n.id}`}
           title={n.title}
           category={n.category}
+          excerpt={n.content}
+          meta={`by ${n.postedBy.name}`}
           date={formatDate(n.createdAt)}
           imageUrl={n.imageUrl}
         />
@@ -64,7 +66,8 @@ export function EventsFeed({ filters }: { filters: FeedFilters }) {
           to={`/events/${e.id}`}
           title={e.title}
           category={e.category}
-          venue={e.venue}
+          excerpt={e.description}
+          meta={`📍 ${e.venue}`}
           date={formatDate(e.startTime)}
           imageUrl={e.imageUrl}
         />

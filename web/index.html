@@ -10,12 +10,8 @@
       (function () {
         try {
           var stored = localStorage.getItem("kgpboard-theme");
-          var theme =
-            stored ||
-            (window.matchMedia("(prefers-color-scheme: dark)").matches
-              ? "dark"
-              : "light");
-          document.documentElement.dataset.theme = theme;
+          // Default to light; only use the stored preference if set.
+          document.documentElement.dataset.theme = stored || "light";
         } catch (e) {}
       })();
     </script>

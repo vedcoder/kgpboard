@@ -2,7 +2,9 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Header } from "./components/Header";
 import { Dashboard } from "./pages/Dashboard";
 import { EventDetail } from "./pages/EventDetail";
+import { Login } from "./pages/Login";
 import { NoticeDetail } from "./pages/NoticeDetail";
+import { Signup } from "./pages/Signup";
 
 function NotFound() {
   return (
@@ -25,6 +27,8 @@ export default function App() {
           <Route path="/events" element={<Dashboard kind="events" />} />
           <Route path="/notices/:id" element={<NoticeDetail />} />
           <Route path="/events/:id" element={<EventDetail />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
