@@ -1,0 +1,37 @@
+# Brings up the API alongside its own Postgres. Usage:
+#   docker compose up --build
+# Then the API is at http://localhost:8000 (docs at /docs).
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: kgpboard
+      POSTGRES_PASSWORD: kgpboard
+      POSTGRES_DB: kgpboard
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # The api service waits until this passes before starting.
+      test: ["CMD-SHELL", "pg_isready -U kgpboard -d kgpboard"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+    ports:
+      - "5433:5432"  # exposed on 5433 to avoid clashing with a local Postgres
+
+  api:
+    build: .
+    environment:
+      # Points at the `db` service by name on the compose network -- not localhost.
+      DATABASE_URL: postgresql+asyncpg://kgpboard:kgpboard@db:5432/kgpboard
+      # Override in real deployments; fine as a dev default here.
+      JWT_SECRET: ${JWT_SECRET:-docker-dev-secret-change-me}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+
+volumes:
+  pgdata:
