@@ -1,0 +1,33 @@
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Header } from "./components/Header";
+import { Dashboard } from "./pages/Dashboard";
+import { EventDetail } from "./pages/EventDetail";
+import { NoticeDetail } from "./pages/NoticeDetail";
+
+function NotFound() {
+  return (
+    <div className="state">
+      <div className="ico">🧭</div>
+      <h3>Page not found</h3>
+      <p>The page you’re looking for doesn’t exist.</p>
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Header />
+      <main className="container">
+        <Routes>
+          <Route path="/" element={<Dashboard kind="notices" />} />
+          <Route path="/notices" element={<Dashboard kind="notices" />} />
+          <Route path="/events" element={<Dashboard kind="events" />} />
+          <Route path="/notices/:id" element={<NoticeDetail />} />
+          <Route path="/events/:id" element={<EventDetail />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </main>
+    </BrowserRouter>
+  );
+}
