@@ -2,9 +2,10 @@
 
 from datetime import datetime
 
-from fastapi import APIRouter, Query, status
+from fastapi import APIRouter, Query, Request, status
 
 from app.api.deps import AdminUser, SessionDep
+from app.core.ratelimit import WRITE_LIMIT, limiter
 from app.schemas.notice import NoticeCreate, NoticeRead
 from app.schemas.pagination import Page
 from app.services import notice as notice_service
@@ -13,8 +14,9 @@ router = APIRouter(prefix="/notices", tags=["notices"])
 
 
 @router.post("", response_model=NoticeRead, status_code=status.HTTP_201_CREATED)
+@limiter.limit(WRITE_LIMIT)
 async def create_notice(
-    payload: NoticeCreate, session: SessionDep, admin: AdminUser
+    request: Request, payload: NoticeCreate, session: SessionDep, admin: AdminUser
 ) -> NoticeRead:
     """Create a notice (admins only). The author is the authenticated admin."""
     return await notice_service.create_notice(

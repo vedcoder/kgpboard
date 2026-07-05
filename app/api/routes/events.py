@@ -2,9 +2,10 @@
 
 from datetime import datetime
 
-from fastapi import APIRouter, Query, status
+from fastapi import APIRouter, Query, Request, status
 
 from app.api.deps import AdminUser, SessionDep
+from app.core.ratelimit import WRITE_LIMIT, limiter
 from app.schemas.event import EventCreate, EventRead
 from app.schemas.pagination import Page
 from app.services import event as event_service
@@ -13,8 +14,9 @@ router = APIRouter(prefix="/events", tags=["events"])
 
 
 @router.post("", response_model=EventRead, status_code=status.HTTP_201_CREATED)
+@limiter.limit(WRITE_LIMIT)
 async def create_event(
-    payload: EventCreate, session: SessionDep, admin: AdminUser
+    request: Request, payload: EventCreate, session: SessionDep, admin: AdminUser
 ) -> EventRead:
     """Create an event (admins only). 400 if startTime is not before endTime."""
     return await event_service.create_event(

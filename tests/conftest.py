@@ -20,10 +20,15 @@ from sqlalchemy.pool import NullPool
 import app.models  # noqa: F401  -- register models on Base.metadata
 from app.api.deps import get_session
 from app.core.config import settings
+from app.core.ratelimit import limiter
 from app.db.base import Base
 from app.main import app
 from app.models.user import UserRole
 from app.services import user as user_service
+
+# Rate limiting is process-global in-memory state; disable it under test so
+# many requests across tests don't trip the limit. It's verified separately.
+limiter.enabled = False
 
 # Same server as dev, but a dedicated database name.
 TEST_URL = make_url(settings.database_url).set(database="kgpboard_test")
