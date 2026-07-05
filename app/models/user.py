@@ -40,5 +40,8 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         default=UserRole.student,
     )
 
+    # Argon2 hash of the user's password. Never exposed by any response schema.
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+
     def __repr__(self) -> str:  # nicer debugging output
         return f"<User {self.email} ({self.role.value})>"

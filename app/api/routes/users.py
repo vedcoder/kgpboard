@@ -12,9 +12,9 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 @router.post("", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 async def create_user(payload: UserCreate, session: SessionDep) -> UserRead:
-    """Create a new user. 409 if the email is already taken."""
+    """Register a new user (public; always a student). 409 if email taken."""
     user = await user_service.create_user(
-        session, name=payload.name, email=payload.email, role=payload.role
+        session, name=payload.name, email=payload.email, password=payload.password
     )
     return user  # FastAPI serializes the ORM object via UserRead (from_attributes)
 

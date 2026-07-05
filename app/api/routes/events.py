@@ -4,7 +4,7 @@ from datetime import datetime
 
 from fastapi import APIRouter, Query, status
 
-from app.api.deps import SessionDep
+from app.api.deps import AdminUser, SessionDep
 from app.schemas.event import EventCreate, EventRead
 from app.schemas.pagination import Page
 from app.services import event as event_service
@@ -13,8 +13,10 @@ router = APIRouter(prefix="/events", tags=["events"])
 
 
 @router.post("", response_model=EventRead, status_code=status.HTTP_201_CREATED)
-async def create_event(payload: EventCreate, session: SessionDep) -> EventRead:
-    """Create an event. 400 if startTime is not before endTime."""
+async def create_event(
+    payload: EventCreate, session: SessionDep, admin: AdminUser
+) -> EventRead:
+    """Create an event (admins only). 400 if startTime is not before endTime."""
     return await event_service.create_event(
         session,
         title=payload.title,

@@ -10,19 +10,20 @@ from app.schemas.base import CamelModel
 
 
 class UserCreate(CamelModel):
-    """Request body for POST /users."""
+    """Request body for POST /users (public self-registration).
 
-    # `min_length=1` rejects empty strings; a missing field is rejected by
-    # Pydantic automatically because it has no default.
+    There is deliberately no `role` field: public sign-up always creates a
+    `student`. Admins are provisioned out-of-band (see scripts/create_admin.py),
+    so a user can never grant themselves admin.
+    """
+
     name: str = Field(min_length=1, max_length=255)
-    # `EmailStr` validates the address format (needs the email-validator lib).
-    email: EmailStr
-    # Defaults to student, so `role` is optional in the request.
-    role: UserRole = UserRole.student
+    email: EmailStr  # validated format (email-validator)
+    password: str = Field(min_length=8, max_length=128)
 
 
 class UserRead(CamelModel):
-    """Response body for a user. Includes server-generated fields."""
+    """Response body for a user. Note: `password_hash` is never included."""
 
     id: uuid.UUID
     name: str

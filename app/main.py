@@ -7,7 +7,7 @@ Interactive docs:  http://127.0.0.1:8000/docs
 from fastapi import FastAPI
 
 from app.api.errors import register_exception_handlers
-from app.api.routes import events, notices, users
+from app.api.routes import auth, events, notices, users
 
 app = FastAPI(
     title="KGPBoard API",
@@ -19,6 +19,7 @@ app = FastAPI(
 register_exception_handlers(app)
 
 # Mount the feature routers.
+app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(notices.router)
 app.include_router(events.router)

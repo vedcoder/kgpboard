@@ -1,15 +1,13 @@
 """Notice service: business rules for notices."""
 
-import uuid
 from collections.abc import Sequence
 from datetime import datetime
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import UserNotFoundError
 from app.models.notice import Notice
+from app.models.user import User
 from app.repositories import notice as notice_repo
-from app.repositories import user as user_repo
 
 
 async def create_notice(
@@ -18,19 +16,13 @@ async def create_notice(
     title: str,
     content: str,
     category: str,
-    posted_by_id: uuid.UUID,
+    poster: User,
 ) -> Notice:
-    """Create a notice, verifying the author (postedBy) actually exists.
+    """Create a notice authored by `poster` (the authenticated admin).
 
-    The DB's foreign key would reject an unknown author too, but checking here
-    lets us return a clear "user not found" message instead of a raw FK error.
+    No "author exists" check is needed anymore -- the poster comes from a valid
+    token, so it's guaranteed to be a real user.
     """
-    poster = await user_repo.get_by_id(session, posted_by_id)
-    if poster is None:
-        raise UserNotFoundError(
-            f"No user found with id '{posted_by_id}' to post this notice."
-        )
-
     notice = await notice_repo.create(
         session,
         title=title,

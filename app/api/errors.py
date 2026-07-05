@@ -11,6 +11,7 @@ from fastapi.responses import JSONResponse
 from app.core.exceptions import (
     DomainError,
     EmailAlreadyExistsError,
+    InvalidCredentialsError,
     InvalidTimeRangeError,
     UserNotFoundError,
 )
@@ -20,6 +21,7 @@ _STATUS_BY_ERROR: dict[type[DomainError], int] = {
     EmailAlreadyExistsError: status.HTTP_409_CONFLICT,
     UserNotFoundError: status.HTTP_400_BAD_REQUEST,
     InvalidTimeRangeError: status.HTTP_400_BAD_REQUEST,
+    InvalidCredentialsError: status.HTTP_401_UNAUTHORIZED,
 }
 
 

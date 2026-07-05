@@ -20,6 +20,15 @@ class Settings(BaseSettings):
     #   postgresql+asyncpg://user:pass@localhost:5432/kgpboard
     database_url: str
 
+    # --- JWT auth ---
+    # Secret used to SIGN tokens. Anyone with this can mint valid tokens, so it
+    # must stay secret and be strong in production. Loaded from the environment.
+    jwt_secret: str
+    # HS256 = symmetric signing with the shared secret above.
+    jwt_algorithm: str = "HS256"
+    # How long an access token stays valid after login.
+    access_token_expire_minutes: int = 60
+
 
 # A single shared instance imported by the rest of the app.
 settings = Settings()  # type: ignore[call-arg]  # values come from the environment

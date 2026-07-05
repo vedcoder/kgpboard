@@ -15,9 +15,10 @@ async def create(
     name: str,
     email: str,
     role: UserRole,
+    password_hash: str,
 ) -> User:
     """Insert a new user and return it (with id/created_at populated)."""
-    user = User(name=name, email=email, role=role)
+    user = User(name=name, email=email, role=role, password_hash=password_hash)
     session.add(user)
     await session.flush()  # emit INSERT now; surfaces the unique-email error here
     await session.refresh(user)  # load server defaults (id, created_at)

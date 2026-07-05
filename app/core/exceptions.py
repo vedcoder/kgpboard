@@ -28,3 +28,7 @@ class UserNotFoundError(DomainError):
 
 class InvalidTimeRangeError(DomainError):
     """An event's startTime is not before its endTime. -> HTTP 400."""
+
+
+class InvalidCredentialsError(DomainError):
+    """Login failed: unknown email or wrong password. -> HTTP 401."""
