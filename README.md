@@ -6,7 +6,9 @@ A full-stack **campus notices & events** platform:
 - **Web** — a responsive React dashboard where students browse notices and
   events, and admins post them.
 
-> **Live demo:** _add your deployed link here after deploying (see [Deployment](#deployment))._
+> **Live demo:** **https://kgpboard.vercel.app**
+> _(Free-tier backend on Render sleeps when idle — the first load may take
+> ~30–60s to wake. Admin login: `asha@kgp.ac.in` / `adminpass123`.)_
 
 ```
 web/   → React + Vite + TypeScript frontend
