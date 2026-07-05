@@ -51,6 +51,11 @@ async def main() -> None:
             session, name="Asha Rao", email="asha@kgp.ac.in",
             password="adminpass123", role=UserRole.admin,
         )
+        # A second admin, so there's more than one person who can post.
+        await user_service.create_user(
+            session, name="Rahul Verma", email="rahul@kgp.ac.in",
+            password="adminpass123", role=UserRole.admin,
+        )
 
         for title, content, category, image in NOTICES:
             await notice_service.create_notice(
@@ -67,7 +72,9 @@ async def main() -> None:
 
     await engine.dispose()
     print(f"Seeded {len(NOTICES)} notices and {len(EVENTS)} events.")
-    print("Admin login: asha@kgp.ac.in / adminpass123")
+    print("Admin logins (password 'adminpass123'):")
+    print("  - asha@kgp.ac.in")
+    print("  - rahul@kgp.ac.in")
 
 
 if __name__ == "__main__":

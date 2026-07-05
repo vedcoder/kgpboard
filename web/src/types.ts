@@ -44,3 +44,22 @@ export interface Page<T> {
 
 // A "feed" is either notices or events.
 export type FeedKind = "notices" | "events";
+
+// Payloads for creating content (admin).
+export interface NoticeInput {
+  title: string;
+  content: string;
+  category: string;
+  imageUrl?: string | null;
+}
+
+export interface EventInput {
+  title: string;
+  description: string;
+  category: string;
+  venue: string;
+  organizer: string;
+  startTime: string; // ISO 8601
+  endTime: string;
+  imageUrl?: string | null;
+}

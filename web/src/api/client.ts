@@ -1,7 +1,14 @@
 // Typed API client. The ONLY place that knows the API's URLs and shapes.
 // Pure fetch, no DOM -- portable to React Native.
 
-import type { EventItem, Notice, Page, User } from "../types";
+import type {
+  EventInput,
+  EventItem,
+  Notice,
+  NoticeInput,
+  Page,
+  User,
+} from "../types";
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
@@ -81,6 +88,21 @@ async function postJson<T>(path: string, body: unknown): Promise<T> {
   return handle<T>(res);
 }
 
+async function postMultipart<T>(path: string, form: FormData): Promise<T> {
+  // Don't set Content-Type: the browser adds the multipart boundary itself.
+  let res: Response;
+  try {
+    res = await fetch(BASE_URL + path, {
+      method: "POST",
+      headers: authHeaders(),
+      body: form,
+    });
+  } catch {
+    throw new ApiError(0, "Could not reach the server. Check your connection.");
+  }
+  return handle<T>(res);
+}
+
 async function postForm<T>(path: string, fields: Record<string, string>): Promise<T> {
   let res: Response;
   try {
@@ -105,6 +127,15 @@ export const api = {
   getNotice: (id: string) => get<Notice>(`/notices/${id}`),
   listEvents: (params: ListParams = {}) => get<Page<EventItem>>("/events", params),
   getEvent: (id: string) => get<EventItem>(`/events/${id}`),
+
+  // --- create (admin) ---
+  createNotice: (input: NoticeInput) => postJson<Notice>("/notices", input),
+  createEvent: (input: EventInput) => postJson<EventItem>("/events", input),
+  uploadImage: (file: File) => {
+    const form = new FormData();
+    form.append("file", file);
+    return postMultipart<{ url: string }>("/uploads", form);
+  },
 
   // --- auth ---
   login: (email: string, password: string) =>
