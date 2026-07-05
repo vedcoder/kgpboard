@@ -24,7 +24,8 @@ async def create_notice(
     The DB's foreign key would reject an unknown author too, but checking here
     lets us return a clear "user not found" message instead of a raw FK error.
     """
-    if await user_repo.get_by_id(session, posted_by_id) is None:
+    poster = await user_repo.get_by_id(session, posted_by_id)
+    if poster is None:
         raise UserNotFoundError(
             f"No user found with id '{posted_by_id}' to post this notice."
         )
@@ -34,7 +35,7 @@ async def create_notice(
         title=title,
         content=content,
         category=category,
-        posted_by_id=posted_by_id,
+        posted_by=poster,
     )
     await session.commit()
     return notice
