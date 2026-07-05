@@ -7,8 +7,18 @@ A full-stack **campus notices & events** platform:
   events, and admins post them.
 
 > **Live demo:** **https://kgpboard.vercel.app**
-> _(Free-tier backend on Render sleeps when idle — the first load may take
-> ~30–60s to wake. Admin login: `asha@kgp.ac.in` / `adminpass123`.)_
+>
+> - **Frontend** → Vercel · **API** → Render (Docker) · **Database** → Render Postgres.
+> - The free API **sleeps when idle**, so the first request may take ~30–60s to wake.
+> - Admin login: `asha@kgp.ac.in` / `adminpass123`.
+>
+> ⚠️ **Free-tier caveats (this deployment):**
+> - The free **Render Postgres is deleted ~30 days after creation** (created
+>   2026-07-05 → expires early August 2026); after that the live demo's data goes.
+> - **Render maintenance window:** July 8th, 06:30 IST (July 8th, 01:00 UTC) —
+>   the app may be briefly unavailable around then.
+> - Uploaded posters are **ephemeral** on the free tier (no persistent disk), so
+>   newly uploaded images may disappear on redeploy; seeded posters still show.
 
 ```
 web/   → React + Vite + TypeScript frontend
@@ -187,6 +197,10 @@ web/src/
 ---
 
 ## Deployment
+
+**This project is deployed as:** frontend on **Vercel**, and the **API +
+Postgres on Render** (provisioned together from [`render.yaml`](render.yaml) —
+Render → New → Blueprint → this repo). The steps below generalise that setup.
 
 Recommended split: **frontend on Vercel**, **backend + Postgres on a host that
 runs a long-lived server** (Render, Railway, or Fly.io). Vercel is ideal for the
