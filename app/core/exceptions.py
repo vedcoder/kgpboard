@@ -32,3 +32,7 @@ class InvalidTimeRangeError(DomainError):
 
 class InvalidCredentialsError(DomainError):
     """Login failed: unknown email or wrong password. -> HTTP 401."""
+
+
+class NotFoundError(DomainError):
+    """A requested resource does not exist. -> HTTP 404."""

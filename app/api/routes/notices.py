@@ -1,5 +1,6 @@
 """Notice endpoints."""
 
+import uuid
 from datetime import datetime
 
 from fastapi import APIRouter, Query, Request, status
@@ -25,7 +26,14 @@ async def create_notice(
         content=payload.content,
         category=payload.category,
         poster=admin,
+        image_url=payload.image_url,
     )
+
+
+@router.get("/{notice_id}", response_model=NoticeRead)
+async def get_notice(notice_id: uuid.UUID, session: SessionDep) -> NoticeRead:
+    """Fetch a single notice by id. 404 if not found."""
+    return await notice_service.get_notice(session, notice_id)
 
 
 @router.get("", response_model=Page[NoticeRead])

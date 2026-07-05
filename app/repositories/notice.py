@@ -1,5 +1,6 @@
 """Notice data access."""
 
+import uuid
 from collections.abc import Sequence
 from datetime import datetime
 
@@ -10,6 +11,12 @@ from app.models.notice import Notice
 from app.models.user import User
 
 
+async def get_by_id(session: AsyncSession, notice_id: uuid.UUID) -> Notice | None:
+    """Fetch a single notice by id (with posted_by loaded), or None."""
+    result = await session.execute(select(Notice).where(Notice.id == notice_id))
+    return result.scalar_one_or_none()
+
+
 async def create(
     session: AsyncSession,
     *,
@@ -17,6 +24,7 @@ async def create(
     content: str,
     category: str,
     posted_by: User,
+    image_url: str | None = None,
 ) -> Notice:
     """Insert a new notice and return it.
 
@@ -30,6 +38,7 @@ async def create(
         content=content,
         category=category,
         posted_by=posted_by,
+        image_url=image_url,
     )
     session.add(notice)
     await session.flush()

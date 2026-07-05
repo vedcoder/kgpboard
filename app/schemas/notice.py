@@ -20,6 +20,7 @@ class NoticeCreate(CamelModel):
     title: str = Field(min_length=1, max_length=255)
     content: str = Field(min_length=1)
     category: str = Field(min_length=1, max_length=100)
+    image_url: str | None = Field(default=None, max_length=500)  # "imageUrl"
 
 
 class NoticeRead(CamelModel):
@@ -31,4 +32,5 @@ class NoticeRead(CamelModel):
     category: str
     # The spec models this as `postedBy (User)`, so we embed the whole user.
     posted_by: UserRead  # serialized as "postedBy"
+    image_url: str | None = None
     created_at: datetime

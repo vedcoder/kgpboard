@@ -5,17 +5,28 @@ Interactive docs:  http://127.0.0.1:8000/docs
 """
 
 from fastapi import FastAPI, Request, status
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from slowapi.errors import RateLimitExceeded
 
 from app.api.errors import register_exception_handlers
 from app.api.routes import auth, events, notices, users
+from app.core.config import settings
 from app.core.ratelimit import limiter
 
 app = FastAPI(
     title="KGPBoard API",
     description="Campus events & notices API.",
     version="0.1.0",
+)
+
+# Allow the browser frontend (different origin) to call the API.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_origin_list,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Register the rate limiter and a 429 handler that matches our error shape.

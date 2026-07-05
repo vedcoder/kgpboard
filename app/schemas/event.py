@@ -23,6 +23,7 @@ class EventCreate(CamelModel):
     start_time: datetime  # accepted as "startTime" (ISO 8601)
     end_time: datetime  # accepted as "endTime"
     organizer: str = Field(min_length=1, max_length=255)
+    image_url: str | None = Field(default=None, max_length=500)  # "imageUrl"
 
 
 class EventRead(CamelModel):
@@ -36,4 +37,5 @@ class EventRead(CamelModel):
     start_time: datetime
     end_time: datetime
     organizer: str
+    image_url: str | None = None
     created_at: datetime

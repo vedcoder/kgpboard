@@ -1,5 +1,6 @@
 """Event data access."""
 
+import uuid
 from collections.abc import Sequence
 from datetime import datetime
 
@@ -19,6 +20,7 @@ async def create(
     start_time: datetime,
     end_time: datetime,
     organizer: str,
+    image_url: str | None = None,
 ) -> Event:
     """Insert a new event and return it."""
     event = Event(
@@ -29,11 +31,17 @@ async def create(
         start_time=start_time,
         end_time=end_time,
         organizer=organizer,
+        image_url=image_url,
     )
     session.add(event)
     await session.flush()  # surfaces the start<end CHECK violation here
     await session.refresh(event)
     return event
+
+
+async def get_by_id(session: AsyncSession, event_id: uuid.UUID) -> Event | None:
+    """Fetch a single event by id, or None."""
+    return await session.get(Event, event_id)
 
 
 def _filters(

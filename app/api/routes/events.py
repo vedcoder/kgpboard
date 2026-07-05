@@ -1,5 +1,6 @@
 """Event endpoints."""
 
+import uuid
 from datetime import datetime
 
 from fastapi import APIRouter, Query, Request, status
@@ -28,7 +29,14 @@ async def create_event(
         start_time=payload.start_time,
         end_time=payload.end_time,
         organizer=payload.organizer,
+        image_url=payload.image_url,
     )
+
+
+@router.get("/{event_id}", response_model=EventRead)
+async def get_event(event_id: uuid.UUID, session: SessionDep) -> EventRead:
+    """Fetch a single event by id. 404 if not found."""
+    return await event_service.get_event(session, event_id)
 
 
 @router.get("", response_model=Page[EventRead])

@@ -18,6 +18,19 @@ async def test_student_cannot_create_notice_403(client, student_headers):
     assert resp.status_code == 403
 
 
+async def test_get_notice_by_id_includes_author(client, admin_headers):
+    created = await client.post("/notices", headers=admin_headers, json=NOTICE)
+    notice_id = created.json()["id"]
+    resp = await client.get(f"/notices/{notice_id}")  # public
+    assert resp.status_code == 200
+    assert resp.json()["postedBy"]["email"] == "admin@test.com"
+
+
+async def test_get_missing_notice_returns_404(client):
+    resp = await client.get("/notices/00000000-0000-0000-0000-000000000000")
+    assert resp.status_code == 404
+
+
 async def test_create_notice_without_token_401(client):
     resp = await client.post("/notices", json=NOTICE)
     assert resp.status_code == 401

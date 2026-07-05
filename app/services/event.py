@@ -1,11 +1,12 @@
 """Event service: business rules for events."""
 
+import uuid
 from collections.abc import Sequence
 from datetime import datetime
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import InvalidTimeRangeError
+from app.core.exceptions import InvalidTimeRangeError, NotFoundError
 from app.models.event import Event
 from app.repositories import event as event_repo
 
@@ -20,6 +21,7 @@ async def create_event(
     start_time: datetime,
     end_time: datetime,
     organizer: str,
+    image_url: str | None = None,
 ) -> Event:
     """Create an event, enforcing that startTime comes before endTime.
 
@@ -38,8 +40,17 @@ async def create_event(
         start_time=start_time,
         end_time=end_time,
         organizer=organizer,
+        image_url=image_url,
     )
     await session.commit()
+    return event
+
+
+async def get_event(session: AsyncSession, event_id: uuid.UUID) -> Event:
+    """Return one event or raise NotFoundError (-> 404)."""
+    event = await event_repo.get_by_id(session, event_id)
+    if event is None:
+        raise NotFoundError(f"No event found with id '{event_id}'.")
     return event
 
 

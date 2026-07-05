@@ -33,5 +33,8 @@ class Event(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     # Notice.postedBy, which is explicitly "(User)").
     organizer: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
 
+    # Optional poster image URL (uploaded via /uploads). Many events won't have one.
+    image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+
     def __repr__(self) -> str:
         return f"<Event {self.title!r}>"

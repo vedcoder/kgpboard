@@ -22,6 +22,26 @@ async def test_admin_can_create_event(client, admin_headers):
     assert resp.json()["organizer"] == "Robotics Club"
 
 
+async def test_create_event_with_poster_roundtrips(client, admin_headers):
+    url = "https://example.com/poster.png"
+    resp = await client.post("/events", headers=admin_headers, json=event(imageUrl=url))
+    assert resp.status_code == 201
+    assert resp.json()["imageUrl"] == url
+
+
+async def test_get_event_by_id(client, admin_headers):
+    created = await client.post("/events", headers=admin_headers, json=event())
+    event_id = created.json()["id"]
+    resp = await client.get(f"/events/{event_id}")  # no auth: reads are public
+    assert resp.status_code == 200
+    assert resp.json()["title"] == "Tech Talk"
+
+
+async def test_get_missing_event_returns_404(client):
+    resp = await client.get("/events/00000000-0000-0000-0000-000000000000")
+    assert resp.status_code == 404
+
+
 async def test_event_start_after_end_returns_400(client, admin_headers):
     resp = await client.post(
         "/events",

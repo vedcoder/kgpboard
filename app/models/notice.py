@@ -28,5 +28,8 @@ class Notice(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     # ORM-level convenience: `notice.posted_by` loads the related User object.
     posted_by: Mapped[User] = relationship(lazy="selectin")
 
+    # Optional poster/graphic image URL (uploaded via /uploads).
+    image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+
     def __repr__(self) -> str:
         return f"<Notice {self.title!r}>"
