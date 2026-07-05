@@ -5,6 +5,7 @@ into a single typed `Settings` object. Nothing that varies per-environment or is
 secret should be hardcoded anywhere else in the app -- it comes from here.
 """
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -19,6 +20,18 @@ class Settings(BaseSettings):
     # SQLAlchemy async connection URL, e.g.
     #   postgresql+asyncpg://user:pass@localhost:5432/kgpboard
     database_url: str
+
+    @field_validator("database_url")
+    @classmethod
+    def _use_async_driver(cls, value: str) -> str:
+        # Hosts like Railway/Heroku hand out `postgres://` or `postgresql://`
+        # URLs; our async engine needs the `+asyncpg` driver. Normalize so the
+        # platform-provided DATABASE_URL works unchanged.
+        if value.startswith("postgres://"):
+            return "postgresql+asyncpg://" + value[len("postgres://") :]
+        if value.startswith("postgresql://"):
+            return "postgresql+asyncpg://" + value[len("postgresql://") :]
+        return value
 
     # --- JWT auth ---
     # Secret used to SIGN tokens. Anyone with this can mint valid tokens, so it
