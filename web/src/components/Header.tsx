@@ -34,6 +34,12 @@ export function Header() {
           {theme === "dark" ? "☀️" : "🌙"}
         </button>
 
+        {user?.role === "admin" && (
+          <Link className="btn primary" to="/create">
+            ＋ New
+          </Link>
+        )}
+
         {user ? (
           <div className="account">
             <span className="avatar" title={user.name}>

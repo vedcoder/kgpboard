@@ -38,6 +38,12 @@ class Settings(BaseSettings):
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
 
+    # --- Uploads ---
+    # Where uploaded posters are written (a Docker volume in production).
+    upload_dir: str = "uploads"
+    # Reject anything larger than this (5 MB).
+    max_upload_bytes: int = 5 * 1024 * 1024
+
 
 # A single shared instance imported by the rest of the app.
 settings = Settings()  # type: ignore[call-arg]  # values come from the environment

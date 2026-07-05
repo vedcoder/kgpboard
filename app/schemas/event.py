@@ -5,6 +5,7 @@ from datetime import datetime
 
 from pydantic import Field
 
+from app.models.event import EventCategory, TargetYear
 from app.schemas.base import CamelModel
 
 
@@ -18,12 +19,14 @@ class EventCreate(CamelModel):
 
     title: str = Field(min_length=1, max_length=255)
     description: str = Field(min_length=1)
-    category: str = Field(min_length=1, max_length=100)
+    category: EventCategory  # must be one of the fixed categories
     venue: str = Field(min_length=1, max_length=255)
     start_time: datetime  # accepted as "startTime" (ISO 8601)
     end_time: datetime  # accepted as "endTime"
     organizer: str = Field(min_length=1, max_length=255)
     image_url: str | None = Field(default=None, max_length=500)  # "imageUrl"
+    registration_url: str | None = Field(default=None, max_length=500)  # "registrationUrl"
+    target_year: TargetYear | None = None  # "targetYear"
 
 
 class EventRead(CamelModel):
@@ -32,10 +35,12 @@ class EventRead(CamelModel):
     id: uuid.UUID
     title: str
     description: str
-    category: str
+    category: EventCategory
     venue: str
     start_time: datetime
     end_time: datetime
     organizer: str
     image_url: str | None = None
+    registration_url: str | None = None
+    target_year: TargetYear | None = None
     created_at: datetime

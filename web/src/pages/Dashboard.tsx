@@ -4,7 +4,7 @@
 
 import { NavLink, useSearchParams } from "react-router-dom";
 import { EventsFeed, NoticesFeed } from "../components/Feeds";
-import { useCategories } from "../hooks/categories";
+import { useMeta } from "../hooks/meta";
 import type { FeedKind } from "../types";
 
 export function Dashboard({ kind }: { kind: FeedKind }) {
@@ -20,7 +20,11 @@ export function Dashboard({ kind }: { kind: FeedKind }) {
   };
 
   const filters = { q: q || undefined, category: category || undefined };
-  const categories = useCategories(kind);
+  const meta = useMeta();
+  const categories =
+    kind === "notices"
+      ? (meta.data?.noticeCategories ?? [])
+      : (meta.data?.eventCategories ?? []);
 
   return (
     <>
@@ -54,7 +58,7 @@ export function Dashboard({ kind }: { kind: FeedKind }) {
             aria-label="Filter by category"
           >
             <option value="">All categories</option>
-            {(categories.data ?? []).map((c) => (
+            {categories.map((c) => (
               <option key={c} value={c}>
                 {c}
               </option>

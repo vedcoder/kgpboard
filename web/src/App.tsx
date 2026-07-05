@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Header } from "./components/Header";
+import { CreatePage } from "./pages/CreatePage";
 import { Dashboard } from "./pages/Dashboard";
 import { EventDetail } from "./pages/EventDetail";
 import { Login } from "./pages/Login";
@@ -29,6 +30,7 @@ export default function App() {
           <Route path="/events/:id" element={<EventDetail />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/create" element={<CreatePage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

@@ -4,13 +4,16 @@ Run in dev with:  uv run uvicorn app.main:app --reload
 Interactive docs:  http://127.0.0.1:8000/docs
 """
 
+from pathlib import Path
+
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from slowapi.errors import RateLimitExceeded
 
 from app.api.errors import register_exception_handlers
-from app.api.routes import auth, events, notices, users
+from app.api.routes import auth, events, meta, notices, uploads, users
 from app.core.config import settings
 from app.core.ratelimit import limiter
 
@@ -44,11 +47,17 @@ async def rate_limit_handler(_: Request, exc: RateLimitExceeded) -> JSONResponse
 # Turn domain/validation errors into clean JSON responses.
 register_exception_handlers(app)
 
+# Serve uploaded posters as static files (dir created if missing).
+Path(settings.upload_dir).mkdir(parents=True, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=settings.upload_dir), name="uploads")
+
 # Mount the feature routers.
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(notices.router)
 app.include_router(events.router)
+app.include_router(uploads.router)
+app.include_router(meta.router)
 
 
 @app.get("/health", tags=["meta"])

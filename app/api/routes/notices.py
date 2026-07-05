@@ -7,6 +7,7 @@ from fastapi import APIRouter, Query, Request, status
 
 from app.api.deps import AdminUser, SessionDep
 from app.core.ratelimit import WRITE_LIMIT, limiter
+from app.models.notice import NoticeCategory
 from app.schemas.notice import NoticeCreate, NoticeRead
 from app.schemas.pagination import Page
 from app.services import notice as notice_service
@@ -39,7 +40,7 @@ async def get_notice(notice_id: uuid.UUID, session: SessionDep) -> NoticeRead:
 @router.get("", response_model=Page[NoticeRead])
 async def list_notices(
     session: SessionDep,
-    category: str | None = Query(None, description="Exact category match."),
+    category: NoticeCategory | None = Query(None, description="Exact category match."),
     date_from: datetime | None = Query(
         None, alias="from", description="Only notices created on/after this time."
     ),

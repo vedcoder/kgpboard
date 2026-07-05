@@ -7,7 +7,7 @@ from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import InvalidTimeRangeError, NotFoundError
-from app.models.event import Event
+from app.models.event import Event, EventCategory, TargetYear
 from app.repositories import event as event_repo
 
 
@@ -16,12 +16,14 @@ async def create_event(
     *,
     title: str,
     description: str,
-    category: str,
+    category: EventCategory,
     venue: str,
     start_time: datetime,
     end_time: datetime,
     organizer: str,
     image_url: str | None = None,
+    registration_url: str | None = None,
+    target_year: TargetYear | None = None,
 ) -> Event:
     """Create an event, enforcing that startTime comes before endTime.
 
@@ -41,6 +43,8 @@ async def create_event(
         end_time=end_time,
         organizer=organizer,
         image_url=image_url,
+        registration_url=registration_url,
+        target_year=target_year,
     )
     await session.commit()
     return event
@@ -57,7 +61,7 @@ async def get_event(session: AsyncSession, event_id: uuid.UUID) -> Event:
 async def list_events(
     session: AsyncSession,
     *,
-    category: str | None = None,
+    category: EventCategory | None = None,
     date_from: datetime | None = None,
     date_to: datetime | None = None,
     q: str | None = None,

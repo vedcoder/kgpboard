@@ -7,7 +7,7 @@ from datetime import datetime
 from sqlalchemy import ColumnElement, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.notice import Notice
+from app.models.notice import Notice, NoticeCategory
 from app.models.user import User
 
 
@@ -22,7 +22,7 @@ async def create(
     *,
     title: str,
     content: str,
-    category: str,
+    category: NoticeCategory,
     posted_by: User,
     image_url: str | None = None,
 ) -> Notice:
@@ -49,7 +49,7 @@ async def create(
 
 def _filters(
     *,
-    category: str | None,
+    category: NoticeCategory | None,
     date_from: datetime | None,
     date_to: datetime | None,
     q: str | None,
@@ -70,7 +70,7 @@ def _filters(
 async def list_(
     session: AsyncSession,
     *,
-    category: str | None = None,
+    category: NoticeCategory | None = None,
     date_from: datetime | None = None,
     date_to: datetime | None = None,
     q: str | None = None,
