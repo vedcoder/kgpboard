@@ -1,8 +1,9 @@
 """Notice data access."""
 
 from collections.abc import Sequence
+from datetime import datetime
 
-from sqlalchemy import select
+from sqlalchemy import ColumnElement, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.notice import Notice
@@ -37,7 +38,48 @@ async def create(
     return notice
 
 
-async def list_all(session: AsyncSession) -> Sequence[Notice]:
-    """Return all notices, newest first."""
-    result = await session.execute(select(Notice).order_by(Notice.created_at.desc()))
-    return result.scalars().all()
+def _filters(
+    *,
+    category: str | None,
+    date_from: datetime | None,
+    date_to: datetime | None,
+    q: str | None,
+) -> list[ColumnElement[bool]]:
+    conditions: list[ColumnElement[bool]] = []
+    if category is not None:
+        conditions.append(Notice.category == category)
+    if date_from is not None:
+        conditions.append(Notice.created_at >= date_from)
+    if date_to is not None:
+        conditions.append(Notice.created_at <= date_to)
+    if q is not None:
+        like = f"%{q}%"
+        conditions.append(or_(Notice.title.ilike(like), Notice.content.ilike(like)))
+    return conditions
+
+
+async def list_(
+    session: AsyncSession,
+    *,
+    category: str | None = None,
+    date_from: datetime | None = None,
+    date_to: datetime | None = None,
+    q: str | None = None,
+    limit: int = 20,
+    offset: int = 0,
+) -> tuple[Sequence[Notice], int]:
+    """Return a filtered, paginated page of notices plus the total match count."""
+    conditions = _filters(category=category, date_from=date_from, date_to=date_to, q=q)
+
+    total = await session.scalar(
+        select(func.count()).select_from(Notice).where(*conditions)
+    )
+
+    result = await session.execute(
+        select(Notice)
+        .where(*conditions)
+        .order_by(Notice.created_at.desc())
+        .limit(limit)
+        .offset(offset)
+    )
+    return result.scalars().all(), total or 0

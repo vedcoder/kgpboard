@@ -40,5 +40,7 @@ async def create_user(
     return user
 
 
-async def list_users(session: AsyncSession) -> Sequence[User]:
-    return await user_repo.list_all(session)
+async def list_users(
+    session: AsyncSession, *, limit: int = 20, offset: int = 0
+) -> tuple[Sequence[User], int]:
+    return await user_repo.list_(session, limit=limit, offset=offset)

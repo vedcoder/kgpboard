@@ -2,6 +2,7 @@
 
 import uuid
 from collections.abc import Sequence
+from datetime import datetime
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -41,5 +42,22 @@ async def create_notice(
     return notice
 
 
-async def list_notices(session: AsyncSession) -> Sequence[Notice]:
-    return await notice_repo.list_all(session)
+async def list_notices(
+    session: AsyncSession,
+    *,
+    category: str | None = None,
+    date_from: datetime | None = None,
+    date_to: datetime | None = None,
+    q: str | None = None,
+    limit: int = 20,
+    offset: int = 0,
+) -> tuple[Sequence[Notice], int]:
+    return await notice_repo.list_(
+        session,
+        category=category,
+        date_from=date_from,
+        date_to=date_to,
+        q=q,
+        limit=limit,
+        offset=offset,
+    )

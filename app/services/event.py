@@ -43,5 +43,22 @@ async def create_event(
     return event
 
 
-async def list_events(session: AsyncSession) -> Sequence[Event]:
-    return await event_repo.list_all(session)
+async def list_events(
+    session: AsyncSession,
+    *,
+    category: str | None = None,
+    date_from: datetime | None = None,
+    date_to: datetime | None = None,
+    q: str | None = None,
+    limit: int = 20,
+    offset: int = 0,
+) -> tuple[Sequence[Event], int]:
+    return await event_repo.list_(
+        session,
+        category=category,
+        date_from=date_from,
+        date_to=date_to,
+        q=q,
+        limit=limit,
+        offset=offset,
+    )

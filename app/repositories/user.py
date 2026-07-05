@@ -3,7 +3,7 @@
 import uuid
 from collections.abc import Sequence
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.user import User, UserRole
@@ -35,7 +35,15 @@ async def get_by_email(session: AsyncSession, email: str) -> User | None:
     return result.scalar_one_or_none()
 
 
-async def list_all(session: AsyncSession) -> Sequence[User]:
-    """Return all users, newest first."""
-    result = await session.execute(select(User).order_by(User.created_at.desc()))
-    return result.scalars().all()
+async def list_(
+    session: AsyncSession,
+    *,
+    limit: int = 20,
+    offset: int = 0,
+) -> tuple[Sequence[User], int]:
+    """Return a paginated page of users (newest first) plus the total count."""
+    total = await session.scalar(select(func.count()).select_from(User))
+    result = await session.execute(
+        select(User).order_by(User.created_at.desc()).limit(limit).offset(offset)
+    )
+    return result.scalars().all(), total or 0

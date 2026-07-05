@@ -1,9 +1,12 @@
 """Notice endpoints."""
 
-from fastapi import APIRouter, status
+from datetime import datetime
+
+from fastapi import APIRouter, Query, status
 
 from app.api.deps import SessionDep
 from app.schemas.notice import NoticeCreate, NoticeRead
+from app.schemas.pagination import Page
 from app.services import notice as notice_service
 
 router = APIRouter(prefix="/notices", tags=["notices"])
@@ -21,7 +24,30 @@ async def create_notice(payload: NoticeCreate, session: SessionDep) -> NoticeRea
     )
 
 
-@router.get("", response_model=list[NoticeRead])
-async def list_notices(session: SessionDep) -> list[NoticeRead]:
-    """List all notices, newest first."""
-    return await notice_service.list_notices(session)
+@router.get("", response_model=Page[NoticeRead])
+async def list_notices(
+    session: SessionDep,
+    category: str | None = Query(None, description="Exact category match."),
+    date_from: datetime | None = Query(
+        None, alias="from", description="Only notices created on/after this time."
+    ),
+    date_to: datetime | None = Query(
+        None, alias="to", description="Only notices created on/before this time."
+    ),
+    q: str | None = Query(
+        None, min_length=1, description="Keyword search in title/content."
+    ),
+    limit: int = Query(20, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+) -> Page[NoticeRead]:
+    """List notices (newest first), filtered and paginated."""
+    items, total = await notice_service.list_notices(
+        session,
+        category=category,
+        date_from=date_from,
+        date_to=date_to,
+        q=q,
+        limit=limit,
+        offset=offset,
+    )
+    return Page(items=items, total=total, limit=limit, offset=offset)

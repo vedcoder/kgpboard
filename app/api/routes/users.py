@@ -1,8 +1,9 @@
 """User endpoints."""
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Query, status
 
 from app.api.deps import SessionDep
+from app.schemas.pagination import Page
 from app.schemas.user import UserCreate, UserRead
 from app.services import user as user_service
 
@@ -18,7 +19,12 @@ async def create_user(payload: UserCreate, session: SessionDep) -> UserRead:
     return user  # FastAPI serializes the ORM object via UserRead (from_attributes)
 
 
-@router.get("", response_model=list[UserRead])
-async def list_users(session: SessionDep) -> list[UserRead]:
-    """List all users, newest first."""
-    return await user_service.list_users(session)
+@router.get("", response_model=Page[UserRead])
+async def list_users(
+    session: SessionDep,
+    limit: int = Query(20, ge=1, le=100, description="Max rows to return."),
+    offset: int = Query(0, ge=0, description="Rows to skip."),
+) -> Page[UserRead]:
+    """List users (newest first), paginated."""
+    items, total = await user_service.list_users(session, limit=limit, offset=offset)
+    return Page(items=items, total=total, limit=limit, offset=offset)
