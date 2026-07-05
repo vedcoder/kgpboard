@@ -36,3 +36,7 @@ class InvalidCredentialsError(DomainError):
 
 class NotFoundError(DomainError):
     """A requested resource does not exist. -> HTTP 404."""
+
+
+class ForbiddenError(DomainError):
+    """The action is not allowed for this user. -> HTTP 403."""

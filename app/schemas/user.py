@@ -30,3 +30,9 @@ class UserRead(CamelModel):
     email: EmailStr
     role: UserRole
     created_at: datetime  # serialized as "createdAt"
+
+
+class UserRoleUpdate(CamelModel):
+    """Request body for PATCH /users/{id}/role."""
+
+    role: UserRole

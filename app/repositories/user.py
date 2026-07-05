@@ -39,12 +39,34 @@ async def get_by_email(session: AsyncSession, email: str) -> User | None:
 async def list_(
     session: AsyncSession,
     *,
+    q: str | None = None,
     limit: int = 20,
     offset: int = 0,
 ) -> tuple[Sequence[User], int]:
-    """Return a paginated page of users (newest first) plus the total count."""
-    total = await session.scalar(select(func.count()).select_from(User))
+    """Return a paginated page of users (newest first) plus the total count.
+
+    `q` filters by email (case-insensitive substring).
+    """
+    conditions = []
+    if q:
+        conditions.append(User.email.ilike(f"%{q}%"))
+
+    total = await session.scalar(
+        select(func.count()).select_from(User).where(*conditions)
+    )
     result = await session.execute(
-        select(User).order_by(User.created_at.desc()).limit(limit).offset(offset)
+        select(User)
+        .where(*conditions)
+        .order_by(User.created_at.desc())
+        .limit(limit)
+        .offset(offset)
     )
     return result.scalars().all(), total or 0
+
+
+async def update_role(session: AsyncSession, user: User, role: UserRole) -> User:
+    """Set a user's role and persist it."""
+    user.role = role
+    await session.flush()
+    await session.refresh(user)
+    return user

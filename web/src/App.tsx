@@ -1,5 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Footer } from "./components/Footer";
 import { Header } from "./components/Header";
+import { AdminUsers } from "./pages/AdminUsers";
 import { CreatePage } from "./pages/CreatePage";
 import { Dashboard } from "./pages/Dashboard";
 import { EventDetail } from "./pages/EventDetail";
@@ -20,8 +22,9 @@ function NotFound() {
 export default function App() {
   return (
     <BrowserRouter>
-      <Header />
-      <main className="container">
+      <div className="app-shell">
+        <Header />
+        <main className="container">
         <Routes>
           <Route path="/" element={<Dashboard kind="notices" />} />
           <Route path="/notices" element={<Dashboard kind="notices" />} />
@@ -31,9 +34,12 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/create" element={<CreatePage />} />
+          <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </main>
+        </main>
+        <Footer />
+      </div>
     </BrowserRouter>
   );
 }
