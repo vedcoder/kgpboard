@@ -4,6 +4,7 @@
 import type {
   EventInput,
   EventItem,
+  Meta,
   Notice,
   NoticeInput,
   Page,
@@ -127,6 +128,7 @@ export const api = {
   getNotice: (id: string) => get<Notice>(`/notices/${id}`),
   listEvents: (params: ListParams = {}) => get<Page<EventItem>>("/events", params),
   getEvent: (id: string) => get<EventItem>(`/events/${id}`),
+  getMeta: () => get<Meta>("/meta"),
 
   // --- create (admin) ---
   createNotice: (input: NoticeInput) => postJson<Notice>("/notices", input),

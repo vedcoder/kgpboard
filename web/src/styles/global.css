@@ -252,6 +252,25 @@ button {
   color: var(--faint);
   pointer-events: none;
 }
+.select.block,
+.select.block select {
+  width: 100%;
+}
+.register-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 20px;
+  padding: 11px 20px;
+  border-radius: 10px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+.register-btn:hover {
+  opacity: 0.92;
+}
 .result-count {
   font-size: 13px;
   color: var(--muted);

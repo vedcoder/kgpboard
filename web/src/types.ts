@@ -31,7 +31,16 @@ export interface EventItem {
   endTime: string;
   organizer: string;
   imageUrl: string | null;
+  registrationUrl: string | null;
+  targetYear: string | null;
   createdAt: string;
+}
+
+// Option lists for dropdowns (from GET /meta).
+export interface Meta {
+  noticeCategories: string[];
+  eventCategories: string[];
+  targetYears: string[];
 }
 
 // The list-endpoint envelope: { items, total, limit, offset }.
@@ -62,4 +71,6 @@ export interface EventInput {
   startTime: string; // ISO 8601
   endTime: string;
   imageUrl?: string | null;
+  registrationUrl?: string | null;
+  targetYear?: string | null;
 }

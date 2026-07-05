@@ -13,7 +13,7 @@ from fastapi.staticfiles import StaticFiles
 from slowapi.errors import RateLimitExceeded
 
 from app.api.errors import register_exception_handlers
-from app.api.routes import auth, events, notices, uploads, users
+from app.api.routes import auth, events, meta, notices, uploads, users
 from app.core.config import settings
 from app.core.ratelimit import limiter
 
@@ -57,6 +57,7 @@ app.include_router(users.router)
 app.include_router(notices.router)
 app.include_router(events.router)
 app.include_router(uploads.router)
+app.include_router(meta.router)
 
 
 @app.get("/health", tags=["meta"])

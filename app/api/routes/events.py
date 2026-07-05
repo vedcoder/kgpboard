@@ -7,6 +7,7 @@ from fastapi import APIRouter, Query, Request, status
 
 from app.api.deps import AdminUser, SessionDep
 from app.core.ratelimit import WRITE_LIMIT, limiter
+from app.models.event import EventCategory
 from app.schemas.event import EventCreate, EventRead
 from app.schemas.pagination import Page
 from app.services import event as event_service
@@ -30,6 +31,8 @@ async def create_event(
         end_time=payload.end_time,
         organizer=payload.organizer,
         image_url=payload.image_url,
+        registration_url=payload.registration_url,
+        target_year=payload.target_year,
     )
 
 
@@ -42,7 +45,7 @@ async def get_event(event_id: uuid.UUID, session: SessionDep) -> EventRead:
 @router.get("", response_model=Page[EventRead])
 async def list_events(
     session: SessionDep,
-    category: str | None = Query(None, description="Exact category match."),
+    category: EventCategory | None = Query(None, description="Exact category match."),
     date_from: datetime | None = Query(
         None, alias="from", description="Only events starting on/after this time."
     ),

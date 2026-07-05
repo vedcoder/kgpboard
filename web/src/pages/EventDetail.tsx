@@ -41,7 +41,25 @@ export function EventDetail() {
             <span>{formatTimeRange(data.startTime, data.endTime)}</span>
             <span className="dot">·</span>
             <span>{data.organizer}</span>
+            {data.targetYear && (
+              <>
+                <span className="dot">·</span>
+                <span>🎓 {data.targetYear}</span>
+              </>
+            )}
           </div>
+
+          {data.registrationUrl && (
+            <a
+              className="register-btn"
+              href={data.registrationUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              📝 Register / Open form
+            </a>
+          )}
+
           <hr />
           <div className="detail-body">{data.description}</div>
         </>

@@ -7,7 +7,7 @@ from datetime import datetime
 from sqlalchemy import ColumnElement, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.event import Event
+from app.models.event import Event, EventCategory, TargetYear
 
 
 async def create(
@@ -15,12 +15,14 @@ async def create(
     *,
     title: str,
     description: str,
-    category: str,
+    category: EventCategory,
     venue: str,
     start_time: datetime,
     end_time: datetime,
     organizer: str,
     image_url: str | None = None,
+    registration_url: str | None = None,
+    target_year: TargetYear | None = None,
 ) -> Event:
     """Insert a new event and return it."""
     event = Event(
@@ -32,6 +34,8 @@ async def create(
         end_time=end_time,
         organizer=organizer,
         image_url=image_url,
+        registration_url=registration_url,
+        target_year=target_year,
     )
     session.add(event)
     await session.flush()  # surfaces the start<end CHECK violation here
@@ -46,7 +50,7 @@ async def get_by_id(session: AsyncSession, event_id: uuid.UUID) -> Event | None:
 
 def _filters(
     *,
-    category: str | None,
+    category: EventCategory | None,
     date_from: datetime | None,
     date_to: datetime | None,
     q: str | None,
@@ -73,7 +77,7 @@ def _filters(
 async def list_(
     session: AsyncSession,
     *,
-    category: str | None = None,
+    category: EventCategory | None = None,
     date_from: datetime | None = None,
     date_to: datetime | None = None,
     q: str | None = None,

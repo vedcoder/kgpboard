@@ -7,7 +7,7 @@ from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import NotFoundError
-from app.models.notice import Notice
+from app.models.notice import Notice, NoticeCategory
 from app.models.user import User
 from app.repositories import notice as notice_repo
 
@@ -17,7 +17,7 @@ async def create_notice(
     *,
     title: str,
     content: str,
-    category: str,
+    category: NoticeCategory,
     poster: User,
     image_url: str | None = None,
 ) -> Notice:
@@ -49,7 +49,7 @@ async def get_notice(session: AsyncSession, notice_id: uuid.UUID) -> Notice:
 async def list_notices(
     session: AsyncSession,
     *,
-    category: str | None = None,
+    category: NoticeCategory | None = None,
     date_from: datetime | None = None,
     date_to: datetime | None = None,
     q: str | None = None,

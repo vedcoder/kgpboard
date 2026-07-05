@@ -10,31 +10,38 @@ from datetime import datetime, timezone
 from sqlalchemy import text
 
 from app.db.session import AsyncSessionLocal, engine
+from app.models.event import EventCategory, TargetYear
+from app.models.notice import NoticeCategory
 from app.models.user import UserRole
 from app.services import event as event_service
 from app.services import notice as notice_service
 from app.services import user as user_service
 
+C = NoticeCategory
+E = EventCategory
+Y = TargetYear
+
 
 def poster(seed: str) -> str:
-    # Stable placeholder posters; load fine in a real browser.
     return f"https://picsum.photos/seed/{seed}/800/500"
 
 
+# (title, content, category, image)
 NOTICES = [
-    ("Central library closed on Aug 15", "The central library will be closed on Aug 15 for annual maintenance. Hall reading rooms remain open 24x7.", "General", None),
-    ("Mid-sem exam schedule released", "The mid-semester examination schedule for Autumn 2026 is now available on the ERP. Check your slots and report 30 minutes early.", "Academic", poster("exam")),
-    ("Hostel water supply cut - RK Hall", "Water supply in RK Hall will be interrupted on Jul 6 from 10am to 2pm for tank cleaning.", "Hostel", None),
-    ("Spring fest volunteer registrations open", "Kshitij needs 200 volunteers across logistics, hospitality and tech. Register by Jul 20.", "General", poster("fest")),
-    ("New PhD scholarship guidelines", "Revised MHRD scholarship disbursement guidelines are effective this semester. Read the full circular attached.", "Academic", None),
+    ("Central library closed on Aug 15", "The central library will be closed on Aug 15 for annual maintenance. Hall reading rooms remain open 24x7.", C.general, None),
+    ("Mid-sem exam schedule released", "The mid-semester examination schedule for Autumn 2026 is now available on the ERP. Check your slots and report 30 minutes early.", C.examination, poster("exam")),
+    ("Hostel water supply cut - RK Hall", "Water supply in RK Hall will be interrupted on Jul 6 from 10am to 2pm for tank cleaning.", C.hostel, None),
+    ("MCM scholarship applications open", "Merit-cum-Means scholarship applications for this semester are open until Jul 31 on the ERP portal.", C.scholarship, poster("scholar")),
+    ("New PhD coursework guidelines", "Revised PhD coursework and credit guidelines are effective this semester. Read the full circular attached.", C.academic, None),
 ]
 
+# (title, desc, category, venue, organizer, start, end, image, registration_url, target_year)
 EVENTS = [
-    ("Robotics Workshop - build a line follower", "Hands-on session where teams assemble and program a line-following robot from scratch. Components provided; bring a laptop.", "Workshop", "Nalanda C3", "Robotics Club", (2026, 8, 5, 10), (2026, 8, 5, 13), poster("robot")),
-    ("TCS Placement Talk", "Pre-placement talk covering roles, CTC bands and the interview process for the 2027 batch.", "Placement", "NR Auditorium", "Career Development Centre", (2026, 7, 10, 15), (2026, 7, 10, 17), None),
-    ("Kshitij Fest Kickoff", "Opening ceremony of Asia's largest techno-management fest with keynote speakers and a light show.", "General", "Gymkhana Grounds", "Kshitij Team", (2026, 8, 1, 18), (2026, 8, 1, 21), poster("kshitij")),
-    ("Guest Lecture: Frontiers in AI", "Distinguished lecture on large models and their societal impact, followed by an open Q&A.", "Talk", "Kalidas Auditorium", "Dept. of CSE", (2026, 7, 18, 16), (2026, 7, 18, 18), poster("ai")),
-    ("Inter-hall Football Final", "The championship decider between LBS and RK halls. Come cheer for your hall!", "Sports", "Tata Sports Complex", "Sports Board", (2026, 7, 25, 17), (2026, 7, 25, 19), None),
+    ("Robotics Workshop - build a line follower", "Hands-on session where teams assemble and program a line-following robot from scratch. Components provided; bring a laptop.", E.workshop, "Nalanda C3", "Robotics Club", (2026, 8, 5, 10), (2026, 8, 5, 13), poster("robot"), "https://forms.gle/robotics-workshop", Y.y1),
+    ("TCS Placement Talk", "Pre-placement talk covering roles, CTC bands and the interview process for the 2027 batch.", E.placement, "NR Auditorium", "Career Development Centre", (2026, 7, 10, 15), (2026, 7, 10, 17), None, "https://forms.gle/tcs-ppt", Y.y4),
+    ("Kshitij Fest Kickoff", "Opening ceremony of Asia's largest techno-management fest with keynote speakers and a light show.", E.fest, "Gymkhana Grounds", "Kshitij Team", (2026, 8, 1, 18), (2026, 8, 1, 21), poster("kshitij"), None, Y.all),
+    ("Guest Lecture: Frontiers in AI", "Distinguished lecture on large models and their societal impact, followed by an open Q&A.", E.talk, "Kalidas Auditorium", "Dept. of CSE", (2026, 7, 18, 16), (2026, 7, 18, 18), poster("ai"), "https://forms.gle/ai-lecture", Y.all),
+    ("Inter-hall Football Final", "The championship decider between LBS and RK halls. Come cheer for your hall!", E.sports, "Tata Sports Complex", "Sports Board", (2026, 7, 25, 17), (2026, 7, 25, 19), None, None, Y.all),
 ]
 
 
@@ -51,7 +58,6 @@ async def main() -> None:
             session, name="Asha Rao", email="asha@kgp.ac.in",
             password="adminpass123", role=UserRole.admin,
         )
-        # A second admin, so there's more than one person who can post.
         await user_service.create_user(
             session, name="Rahul Verma", email="rahul@kgp.ac.in",
             password="adminpass123", role=UserRole.admin,
@@ -63,10 +69,11 @@ async def main() -> None:
                 poster=admin, image_url=image,
             )
 
-        for title, desc, category, venue, org, start, end, image in EVENTS:
+        for title, desc, cat, venue, org, start, end, image, reg, year in EVENTS:
             await event_service.create_event(
-                session, title=title, description=desc, category=category,
+                session, title=title, description=desc, category=cat,
                 venue=venue, organizer=org, image_url=image,
+                registration_url=reg, target_year=year,
                 start_time=dt(*start), end_time=dt(*end),
             )
 

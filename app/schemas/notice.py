@@ -5,6 +5,7 @@ from datetime import datetime
 
 from pydantic import Field
 
+from app.models.notice import NoticeCategory
 from app.schemas.base import CamelModel
 from app.schemas.user import UserRead
 
@@ -19,7 +20,7 @@ class NoticeCreate(CamelModel):
 
     title: str = Field(min_length=1, max_length=255)
     content: str = Field(min_length=1)
-    category: str = Field(min_length=1, max_length=100)
+    category: NoticeCategory  # must be one of the fixed categories
     image_url: str | None = Field(default=None, max_length=500)  # "imageUrl"
 
 
@@ -29,7 +30,7 @@ class NoticeRead(CamelModel):
     id: uuid.UUID
     title: str
     content: str
-    category: str
+    category: NoticeCategory
     # The spec models this as `postedBy (User)`, so we embed the whole user.
     posted_by: UserRead  # serialized as "postedBy"
     image_url: str | None = None

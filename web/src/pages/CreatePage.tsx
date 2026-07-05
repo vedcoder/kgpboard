@@ -7,6 +7,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { ApiError, api } from "../api/client";
 import { useAuth } from "../auth/AuthProvider";
+import { useMeta } from "../hooks/meta";
 
 type Kind = "notice" | "event";
 
@@ -16,6 +17,7 @@ export function CreatePage() {
   const queryClient = useQueryClient();
   const fileInput = useRef<HTMLInputElement>(null);
 
+  const meta = useMeta();
   const [kind, setKind] = useState<Kind>("notice");
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
@@ -25,9 +27,16 @@ export function CreatePage() {
   const [organizer, setOrganizer] = useState("");
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
+  const [registrationUrl, setRegistrationUrl] = useState("");
+  const [targetYear, setTargetYear] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+
+  const categoryOptions =
+    kind === "notice"
+      ? (meta.data?.noticeCategories ?? [])
+      : (meta.data?.eventCategories ?? []);
 
   const preview = useMemo(() => (file ? URL.createObjectURL(file) : null), [file]);
   useEffect(() => () => { if (preview) URL.revokeObjectURL(preview); }, [preview]);
@@ -67,6 +76,8 @@ export function CreatePage() {
           startTime: new Date(start).toISOString(),
           endTime: new Date(end).toISOString(),
           imageUrl,
+          registrationUrl: registrationUrl || undefined,
+          targetYear: targetYear || undefined,
         });
         await queryClient.invalidateQueries({ queryKey: ["events"] });
         await queryClient.invalidateQueries({ queryKey: ["categories", "events"] });
@@ -88,14 +99,20 @@ export function CreatePage() {
           <button
             type="button"
             className={kind === "notice" ? "active" : ""}
-            onClick={() => setKind("notice")}
+            onClick={() => {
+              setKind("notice");
+              setCategory("");
+            }}
           >
             Notice
           </button>
           <button
             type="button"
             className={kind === "event" ? "active" : ""}
-            onClick={() => setKind("event")}
+            onClick={() => {
+              setKind("event");
+              setCategory("");
+            }}
           >
             Event
           </button>
@@ -140,13 +157,23 @@ export function CreatePage() {
 
         <div className="field">
           <label htmlFor="category">Category</label>
-          <input
-            id="category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            placeholder="e.g. Placement, Academic, Workshop"
-            required
-          />
+          <div className="select block">
+            <select
+              id="category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              required
+            >
+              <option value="" disabled>
+                Choose a category…
+              </option>
+              {categoryOptions.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {kind === "notice" ? (
@@ -207,6 +234,33 @@ export function CreatePage() {
                   required
                 />
               </div>
+            </div>
+            <div className="field">
+              <label htmlFor="targetYear">Target year (optional)</label>
+              <div className="select block">
+                <select
+                  id="targetYear"
+                  value={targetYear}
+                  onChange={(e) => setTargetYear(e.target.value)}
+                >
+                  <option value="">Not specified</option>
+                  {(meta.data?.targetYears ?? []).map((y) => (
+                    <option key={y} value={y}>
+                      {y}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="field">
+              <label htmlFor="registrationUrl">Registration link (optional)</label>
+              <input
+                id="registrationUrl"
+                type="url"
+                value={registrationUrl}
+                onChange={(e) => setRegistrationUrl(e.target.value)}
+                placeholder="https://forms.gle/…"
+              />
             </div>
           </>
         )}
