@@ -14,3 +14,19 @@ dependencies = [
     "sqlalchemy[asyncio]>=2.0",
     "uvicorn[standard]>=0.50.0",
 ]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+]
+
+[tool.pytest.ini_options]
+# `auto` = treat every async test as asyncio without decorating each one.
+asyncio_mode = "auto"
+# Each test gets its own event loop; fixtures share that per-test loop.
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+# Put the project root on sys.path so `import app...` works under pytest.
+pythonpath = ["."]
