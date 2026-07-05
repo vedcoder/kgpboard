@@ -1,0 +1,32 @@
+# Render Blueprint: provisions the API + a Postgres database together.
+# On Render: New > Blueprint > pick this repo. It builds the Dockerfile, creates
+# the database, wires DATABASE_URL, and generates a JWT secret.
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: kgpboard-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: oregon
+    healthCheckPath: /health
+    envVars:
+      # Internal connection string from the database below (postgresql://...).
+      # The app auto-rewrites it to the async (+asyncpg) driver at startup.
+      - key: DATABASE_URL
+        fromDatabase:
+          name: kgpboard-db
+          property: connectionString
+      # Render generates a strong random secret and keeps it stable.
+      - key: JWT_SECRET
+        generateValue: true
+      # Set this in the Render dashboard once the frontend is deployed, e.g.
+      #   https://your-app.vercel.app
+      - key: CORS_ORIGINS
+        sync: false
+
+databases:
+  - name: kgpboard-db
+    plan: free
+    region: oregon
