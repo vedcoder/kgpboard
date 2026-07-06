@@ -37,8 +37,9 @@ is deliberately free of DOM code so a future mobile app could reuse it.
 - Detail pages, deep-linkable (`/notices/:id`, `/events/:id`).
 - Keyword search **and** category filter, together, stored in the URL.
 - "Load more" pagination, loading/error/empty states, dark mode (remembered).
-- Auth: sign up / log in; admins get a **＋ New** form to post notices/events
-  with **drag-drop poster upload**.
+- Auth: sign up (with inline field validation) / log in; admins get a **＋ New**
+  form to post notices/events with **drag-drop poster upload**.
+- Admin **user management** page: search users by email and change their role.
 
 **Backend API**
 - Users, notices, events with full validation and informative JSON errors.
@@ -115,7 +116,8 @@ Base URL `http://localhost:8000`, interactive docs at `/docs`.
 | POST | `/auth/login` | — | Exchange email + password for a token |
 | GET | `/auth/me` | user | The current authenticated user |
 | POST | `/users` | — | Register (public; always a student) |
-| GET | `/users` | — | List users (paginated) |
+| GET | `/users` | **admin** | List/search users by email (paginated) |
+| PATCH | `/users/{id}/role` | **admin** | Change a user's role (not your own) |
 | GET/POST | `/notices` | read: — / write: **admin** | List / create notices |
 | GET | `/notices/{id}` | — | A single notice |
 | GET/POST | `/events` | read: — / write: **admin** | List / create events |
