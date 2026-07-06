@@ -1,11 +1,17 @@
 """User service: business rules for users."""
 
+import uuid
 from collections.abc import Sequence
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import EmailAlreadyExistsError, InvalidCredentialsError
+from app.core.exceptions import (
+    EmailAlreadyExistsError,
+    ForbiddenError,
+    InvalidCredentialsError,
+    NotFoundError,
+)
 from app.core.security import hash_password, verify_password
 from app.models.user import User, UserRole
 from app.repositories import user as user_repo
@@ -60,6 +66,26 @@ async def authenticate_user(
 
 
 async def list_users(
-    session: AsyncSession, *, limit: int = 20, offset: int = 0
+    session: AsyncSession, *, q: str | None = None, limit: int = 20, offset: int = 0
 ) -> tuple[Sequence[User], int]:
-    return await user_repo.list_(session, limit=limit, offset=offset)
+    return await user_repo.list_(session, q=q, limit=limit, offset=offset)
+
+
+async def set_user_role(
+    session: AsyncSession, *, actor: User, user_id: uuid.UUID, role: UserRole
+) -> User:
+    """Change a user's role (admin action).
+
+    An admin cannot change their *own* role -- that guards against the last
+    admin accidentally demoting themselves and locking everyone out.
+    """
+    if user_id == actor.id:
+        raise ForbiddenError("You can't change your own role.")
+
+    user = await user_repo.get_by_id(session, user_id)
+    if user is None:
+        raise NotFoundError(f"No user found with id '{user_id}'.")
+
+    updated = await user_repo.update_role(session, user, role)
+    await session.commit()
+    return updated

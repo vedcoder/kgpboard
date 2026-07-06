@@ -173,10 +173,41 @@ button {
   color: var(--accent);
 }
 
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
 .container {
+  flex: 1 0 auto;
+  width: 100%;
   max-width: 940px;
   margin: 0 auto;
-  padding: 24px 20px 80px;
+  padding: 24px 20px 60px;
+}
+.footer {
+  width: 100%;
+  max-width: 940px;
+  margin: 0 auto;
+  padding: 20px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.footer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.footer-link:hover {
+  color: var(--accent);
 }
 
 /* ---- Controls ---- */
@@ -315,21 +346,21 @@ button {
   height: 100%;
   display: grid;
   place-items: center;
-  gap: 4px;
   background: linear-gradient(135deg, var(--surface-2), var(--surface));
-  color: var(--faint);
 }
-.card-image-empty .mono {
-  font-size: 34px;
-  font-weight: 800;
-  color: color-mix(in srgb, var(--accent) 45%, var(--faint));
+.card-image-empty .emoji {
+  font-size: 40px;
   line-height: 1;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.12));
 }
-.card-image-empty .lbl {
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
+/* Tinted gradient per category tone. */
+.card-image-empty.blue { background: linear-gradient(135deg, color-mix(in srgb, #2563eb 20%, var(--surface)), var(--surface)); }
+.card-image-empty.amber { background: linear-gradient(135deg, color-mix(in srgb, #b45309 20%, var(--surface)), var(--surface)); }
+.card-image-empty.violet { background: linear-gradient(135deg, color-mix(in srgb, #7c3aed 20%, var(--surface)), var(--surface)); }
+.card-image-empty.teal { background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 20%, var(--surface)), var(--surface)); }
+.card-image-empty.slate { background: linear-gradient(135deg, color-mix(in srgb, #475569 18%, var(--surface)), var(--surface)); }
+.card-image-empty.green { background: linear-gradient(135deg, color-mix(in srgb, #15803d 20%, var(--surface)), var(--surface)); }
+.card-image-empty.rose { background: linear-gradient(135deg, color-mix(in srgb, #be123c 20%, var(--surface)), var(--surface)); }
 .card .chip.overlay {
   position: absolute;
   top: 10px;
@@ -589,6 +620,17 @@ button {
   font-size: 13.5px;
   margin-bottom: 14px;
 }
+.field-error {
+  font-size: 12.5px;
+  color: var(--danger);
+}
+.field-hint {
+  font-size: 12.5px;
+  color: var(--faint);
+}
+.field input[aria-invalid="true"] {
+  border-color: var(--danger);
+}
 .auth-alt {
   text-align: center;
   font-size: 13.5px;
@@ -598,6 +640,57 @@ button {
 .auth-alt a {
   color: var(--accent);
   font-weight: 600;
+}
+
+/* ---- Admin users ---- */
+.admin-title {
+  font-size: 24px;
+  letter-spacing: -0.02em;
+  margin: 0 0 4px;
+}
+.admin-sub {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 0 0 18px;
+}
+.admin-search {
+  margin-bottom: 18px;
+}
+.user-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.user-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.user-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+.user-name {
+  font-weight: 600;
+  font-size: 14.5px;
+}
+.user-email {
+  font-size: 13px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.user-row .select select {
+  text-transform: capitalize;
 }
 
 /* ---- Create form ---- */

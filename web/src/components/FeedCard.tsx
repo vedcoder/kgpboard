@@ -2,7 +2,7 @@
 // Every card has an image area; without a poster it shows a placeholder.
 
 import { Link } from "react-router-dom";
-import { categoryTone } from "../lib/format";
+import { categoryEmoji, categoryTone } from "../lib/format";
 
 interface Props {
   to: string;
@@ -22,9 +22,10 @@ export function FeedCard({ to, title, category, date, excerpt, meta, imageUrl }:
         {imageUrl ? (
           <img src={imageUrl} alt="" loading="lazy" />
         ) : (
-          <div className="card-image-empty">
-            <span className="mono">{category.charAt(0).toUpperCase()}</span>
-            <span className="lbl">No image</span>
+          <div className={`card-image-empty ${tone}`}>
+            <span className="emoji" aria-hidden="true">
+              {categoryEmoji(category)}
+            </span>
           </div>
         )}
         <span className={`chip overlay ${tone}`}>{category}</span>

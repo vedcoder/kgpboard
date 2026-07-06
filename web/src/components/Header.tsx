@@ -35,9 +35,14 @@ export function Header() {
         </button>
 
         {user?.role === "admin" && (
-          <Link className="btn primary" to="/create">
-            ＋ New
-          </Link>
+          <>
+            <Link className="btn" to="/admin/users">
+              Users
+            </Link>
+            <Link className="btn primary" to="/create">
+              ＋ New
+            </Link>
+          </>
         )}
 
         {user ? (

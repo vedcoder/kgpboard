@@ -49,3 +49,22 @@ export function categoryTone(category: string): Tone {
   for (let i = 0; i < category.length; i++) hash = (hash * 31 + category.charCodeAt(i)) >>> 0;
   return TONES[hash % TONES.length];
 }
+
+// A representative emoji per category, used for the no-poster placeholder.
+const EMOJI: Record<string, string> = {
+  academic: "📚",
+  examination: "📝",
+  placement: "💼",
+  hostel: "🏠",
+  scholarship: "🎓",
+  general: "📢",
+  workshop: "🔧",
+  talk: "🎤",
+  cultural: "🎭",
+  sports: "⚽",
+  fest: "🎉",
+};
+
+export function categoryEmoji(category: string): string {
+  return EMOJI[category.toLowerCase()] ?? "📌";
+}

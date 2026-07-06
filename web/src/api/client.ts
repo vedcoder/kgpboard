@@ -104,6 +104,20 @@ async function postMultipart<T>(path: string, form: FormData): Promise<T> {
   return handle<T>(res);
 }
 
+async function patchJson<T>(path: string, body: unknown): Promise<T> {
+  let res: Response;
+  try {
+    res = await fetch(BASE_URL + path, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...authHeaders() },
+      body: JSON.stringify(body),
+    });
+  } catch {
+    throw new ApiError(0, "Could not reach the server. Check your connection.");
+  }
+  return handle<T>(res);
+}
+
 async function postForm<T>(path: string, fields: Record<string, string>): Promise<T> {
   let res: Response;
   try {
@@ -138,6 +152,11 @@ export const api = {
     form.append("file", file);
     return postMultipart<{ url: string }>("/uploads", form);
   },
+
+  // --- user management (admin) ---
+  listUsers: (params: ListParams = {}) => get<Page<User>>("/users", params),
+  changeUserRole: (id: string, role: "student" | "admin") =>
+    patchJson<User>(`/users/${id}/role`, { role }),
 
   // --- auth ---
   login: (email: string, password: string) =>

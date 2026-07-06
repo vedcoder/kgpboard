@@ -49,20 +49,82 @@ async def test_duplicate_email_returns_409(client):
     assert "already exists" in resp.json()["detail"]
 
 
-async def test_list_users_pagination_envelope(client):
+async def test_list_users_requires_admin(client, student_headers):
+    assert (await client.get("/users")).status_code == 401  # no token
+    assert (await client.get("/users", headers=student_headers)).status_code == 403
+
+
+async def test_list_users_pagination_envelope(client, admin_headers):
+    # admin_headers already created 1 admin; add 3 students -> 4 total.
     for i in range(3):
         await client.post(
             "/users",
             json={"name": f"U{i}", "email": f"u{i}@test.com", "password": "password1"},
         )
-    resp = await client.get("/users", params={"limit": 2, "offset": 0})
+    resp = await client.get("/users", params={"limit": 2}, headers=admin_headers)
     assert resp.status_code == 200
     body = resp.json()
-    assert body["total"] == 3
+    assert body["total"] == 4
     assert body["limit"] == 2
     assert len(body["items"]) == 2
 
 
-async def test_list_users_invalid_limit_returns_400(client):
-    resp = await client.get("/users", params={"limit": 0})
+async def test_list_users_search_by_email(client, admin_headers):
+    await client.post(
+        "/users", json={"name": "Zed", "email": "zed@kgp.ac.in", "password": "password1"}
+    )
+    resp = await client.get("/users", params={"q": "zed"}, headers=admin_headers)
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["total"] == 1
+    assert body["items"][0]["email"] == "zed@kgp.ac.in"
+
+
+async def test_list_users_invalid_limit_returns_400(client, admin_headers):
+    resp = await client.get("/users", params={"limit": 0}, headers=admin_headers)
     assert resp.status_code == 400
+
+
+async def test_admin_can_change_user_role(client, admin_headers):
+    created = await client.post(
+        "/users", json={"name": "Ravi", "email": "ravi@test.com", "password": "password1"}
+    )
+    user_id = created.json()["id"]
+    resp = await client.patch(
+        f"/users/{user_id}/role", json={"role": "admin"}, headers=admin_headers
+    )
+    assert resp.status_code == 200
+    assert resp.json()["role"] == "admin"
+
+
+async def test_admin_cannot_change_own_role(client, admin_headers):
+    me = await client.get("/auth/me", headers=admin_headers)
+    my_id = me.json()["id"]
+    resp = await client.patch(
+        f"/users/{my_id}/role", json={"role": "student"}, headers=admin_headers
+    )
+    assert resp.status_code == 403
+
+
+async def test_change_role_requires_admin(client, student_headers):
+    other = await client.post(
+        "/users", json={"name": "X", "email": "x@test.com", "password": "password1"}
+    )
+    uid = other.json()["id"]
+    assert (
+        await client.patch(f"/users/{uid}/role", json={"role": "admin"})
+    ).status_code == 401
+    assert (
+        await client.patch(
+            f"/users/{uid}/role", json={"role": "admin"}, headers=student_headers
+        )
+    ).status_code == 403
+
+
+async def test_change_role_unknown_user_404(client, admin_headers):
+    resp = await client.patch(
+        "/users/00000000-0000-0000-0000-000000000000/role",
+        json={"role": "admin"},
+        headers=admin_headers,
+    )
+    assert resp.status_code == 404
